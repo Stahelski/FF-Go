@@ -7,6 +7,7 @@
 package main
 
 import (
+	"ff-htmx-go/components" // Bruk navnet fra go.mod + mappenavnet
 	"html/template"
 	"net/http"
 )
@@ -23,7 +24,21 @@ func main() {
 	http.HandleFunc("/test-side", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := template.Must(template.ParseFiles("templates/test-side.html"))
 		tmpl.Execute(w, nil)
+		// Vi lager dataene
+		data := components.CardData{
+			ID: "123",
+			Title: "Hei fra Go",
+			Description: "Dette er kortet, og du kan nå GO lang",
+		}
+		// Vi henter HTML-strengen
+		htmlFragment := components.RenderCard(data)
+
+		// Her må vi sende htmlFragment inn i templaten vår eller skrive direkte
+		w.Write([]byte(htmlFragment))
 	})
+
+	
+
 // Start serveren på port 8080 - skal alltid være sist i main()
     http.ListenAndServe(":8080", nil)
 }
