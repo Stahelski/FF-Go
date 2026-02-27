@@ -16,7 +16,7 @@ tasks:
     desc: Start utviklingsserveren
     deps: [tidy] # Rydder avhengigheter før oppstart
     cmds:
-      - go run ./... # Kompilerer og starter alle Go-filer i prosjektet
+      - go run ./cmd/app # Kompilerer og starter alle Go-filer i prosjektet
 
   test:
     desc: Kjør tester
@@ -26,4 +26,4 @@ tasks:
   build:
     desc: Bygg for produksjon
     cmds:
-      - go build -o ./bin/server ./... # Kompilerer til en binærfil i ./bin/server
+      - go build -o ./bin/server ./cmd/app # Kompilerer til en binærfil i ./bin/server

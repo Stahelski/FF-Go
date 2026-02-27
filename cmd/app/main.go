@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("/static"))))
-	http.Handle("/components/", http.StripPrefix("/components/", http.FileServer(http.Dir("/components"))))
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.Handle("/components/", http.StripPrefix("/components/", http.FileServer(http.Dir("components"))))
     
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         tmpl := template.Must(template.ParseFiles("internal/templates/index.html"))
@@ -30,23 +30,18 @@ func main() {
 	        Description: "Dette er kortet, og du kan nå GO lang",
         } 
 
-        // 2️⃣ Så genererer vi HTML-fragmentet
-        // Vi henter HTML-strengen
-        htmlFragment := components.RenderCard(data)
+ 	// 2️⃣ Generer fragment
+	 htmlFragment := components.RenderCard(data)
 
-        // 3️⃣ Så laster vi templaten
-        tmpl := template.Must(template.ParseFiles("internal/templates/test-side.html"))
+	 // 3️⃣ Last template
+	 tmpl := template.Must(
+		 template.ParseFiles("internal/templates/test-side.html"),
+	 )
 
-
-        // 4️⃣ Vi sender fragmentet inn i templaten
-		w.Write([]byte(htmlFragment))
-		tmpl.Execute(w, nil)
-    //     tmpl.Execute(w, map[string]any{
-	//         "Card": template.HTML(htmlFragment),
-    // })
-		// Vi lager dataene
-
-		// Her må vi sende htmlFragment inn i templaten vår eller skrive direkte
+	 // 4️⃣ Send alt samlet én gang
+	 tmpl.Execute(w, map[string]any{
+		 "Card": template.HTML(htmlFragment),
+	 })
 	})
 
 
