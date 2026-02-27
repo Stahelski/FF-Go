@@ -1,0 +1,17 @@
+<!-- web/templates/layout.html -->
+<!-- This file serves as the base HTML layout template for the application. -->
+<!-- It should include common elements like header, footer, navigation, and placeholders for dynamic content (e.g., {{define "content"}}). -->
+<!-- Use it as a wrapper for other templates like user_card.html or feed.html. -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <script type="module" src="/public/datastar.js"></script>
+</head>
+<body>
+    <h1>Test side</h1>
+    <a href="/">Tilbake til forsiden</a>
+    <div>{{.Card}}</div>
+</body>
+</html>
