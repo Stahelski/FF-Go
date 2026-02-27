@@ -37,7 +37,6 @@ func main() {
 		w.Write([]byte(htmlFragment))
 	})
 
-	
 
 // Start serveren på port 8080 - skal alltid være sist i main()
     http.ListenAndServe(":8080", nil)

@@ -1,0 +1,29 @@
+version: '3'
+
+# For å bruke korte komandoer:
+# task tidy
+# task start
+# task test
+# task build
+
+tasks:
+  tidy:
+    desc: Rydder opp Go-avhengigheter
+    cmds:
+      - go mod tidy # Synkroniserer go.mod og go.sum – kjør når du legger til/fjerner pakker
+
+  start:
+    desc: Start utviklingsserveren
+    deps: [tidy] # Rydder avhengigheter før oppstart
+    cmds:
+      - go run ./... # Kompilerer og starter alle Go-filer i prosjektet
+
+  test:
+    desc: Kjør tester
+    cmds:
+      - go test ./... # Kjører alle tester rekursivt i hele prosjektet
+
+  build:
+    desc: Bygg for produksjon
+    cmds:
+      - go build -o ./bin/server ./... # Kompilerer til en binærfil i ./bin/server
