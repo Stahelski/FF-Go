@@ -7,34 +7,46 @@
 package main
 
 import (
-	"ff-htmx-go/components" // Bruk navnet fra go.mod + mappenavnet
+	"ff-htmx-go/internal/components" // Bruk navnet fra go.mod + mappenavnet
 	"html/template"
 	"net/http"
 )
 
 func main() {
-    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("public"))))
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("/static"))))
+	http.Handle("/components/", http.StripPrefix("/components/", http.FileServer(http.Dir("/components"))))
     
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        tmpl := template.Must(template.ParseFiles("templates/index.html"))
+        tmpl := template.Must(template.ParseFiles("internal/templates/index.html"))
         tmpl.Execute(w, nil)
     })
 
 	http.HandleFunc("/test-side", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles("templates/test-side.html"))
+
+        // 1️⃣ Først lager vi dataene
+        data := components.CardData{
+	        ID: "123",
+	        Title: "Hei fra Go",
+	        Description: "Dette er kortet, og du kan nå GO lang",
+        } 
+
+        // 2️⃣ Så genererer vi HTML-fragmentet
+        // Vi henter HTML-strengen
+        htmlFragment := components.RenderCard(data)
+
+        // 3️⃣ Så laster vi templaten
+        tmpl := template.Must(template.ParseFiles("internal/templates/test-side.html"))
+
+
+        // 4️⃣ Vi sender fragmentet inn i templaten
+		w.Write([]byte(htmlFragment))
 		tmpl.Execute(w, nil)
+    //     tmpl.Execute(w, map[string]any{
+	//         "Card": template.HTML(htmlFragment),
+    // })
 		// Vi lager dataene
-		data := components.CardData{
-			ID: "123",
-			Title: "Hei fra Go",
-			Description: "Dette er kortet, og du kan nå GO lang",
-		}
-		// Vi henter HTML-strengen
-		htmlFragment := components.RenderCard(data)
 
 		// Her må vi sende htmlFragment inn i templaten vår eller skrive direkte
-		w.Write([]byte(htmlFragment))
 	})
 
 
