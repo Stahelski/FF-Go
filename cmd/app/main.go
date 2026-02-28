@@ -4,51 +4,62 @@
 // 2. Static    - serverer CSS og andre filer fra /static/ mappen
 // 3. Server    - start serveren (http.ListenAndServe) - skal alltid være SIST
 
-//! 14:24
-// https://www.youtube.com/watch?v=o90ZnlorYwA
-
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 )
 
-func main(){
-	// Route handler for home page (root URL)
-http.HandleFunc("/", home)
-http.HandleFunc("/projects", projects)
-http.HandleFunc("/about", about)
+// Parse ALLE templates én gang ved oppstart
+var templates = template.Must(
+	template.ParseGlob("internal/templates/*.html"),
+)
 
-// Start server
-err := http.ListenAndServe(":8080", nil)
-if err != nil{
-	log.Fatal(err)
-}
+func main() {
+
+	// Routes
+	http.HandleFunc("/", home)
+	http.HandleFunc("/about", about)
+	http.HandleFunc("/projects", projects)
+
+	// Static files
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	fmt.Println("Server is running on http://localhost:8080")
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-//Home func handels requests to home
-func home(w http.ResponseWriter, r *http.Request){
+// ---------------- ROUTES ----------------
+
+func home(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 	renderTemplate(w, "home.html")
 }
 
-func projects(w http.ResponseWriter, r *http.Request){
-	renderTemplate(w, "internal/templates/about.html") //! Funker denne route?
+func about(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "about.html")
 }
 
-func about(w http.ResponseWriter, r *http.Request){
-	renderTemplate(w, "/internal/templates/about.html") //! Funker denne route?
+func projects(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "projects.html")
 }
 
+// ---------------- TEMPLATE RENDER ----------------
 
-
-func renderTemplate(w http.ResponseWriter, tmpl string){
-	// Parsing the specified template file being passed as input (home, about, etc...)
-	t, err := template.ParseFiles("/internal/templates" + tmpl)
+func renderTemplate(w http.ResponseWriter, name string) {
+	err := templates.ExecuteTemplate(w, name, nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	t.Execute(w, nil)
 }
-
